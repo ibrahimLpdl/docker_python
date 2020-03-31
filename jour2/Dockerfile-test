@@ -1,0 +1,34 @@
+FROM ubuntu
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# install all
+RUN apt-get update -y && apt-get install -y python3.6 python3-pip vim jupyter git
+
+# move to src
+
+WORKDIR workspace/
+
+
+RUN touch start.sh
+RUN chmod 777 start.sh
+RUN echo "set -m\njupyter notebook --port=8888 --no-browser --ip=0.0.0.0 --allow-root & \n flask run --host=0.0.0.0 \n fg %1 " > start.sh 
+
+
+# requirement.txt
+#RUN touch requirement.txt
+#RUN echo -e "matplotlib>=1.1.1\npandas>=1.0.0" > requirement.txt
+
+
+# install library
+#RUN pip3 install -r requirement.txt --no-index --find-links file:src/packages
+RUN pip3 install flask numpy pandas
+
+ENV FLASK_APP "docker/app/simple_api_0.py"
+ENV FLASK_ENV "development"
+ENV FLASK_DEBUG True
+
+# run jupyter server
+#CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
+#CMD flask run --host=0.0.0.0 
+CMD ./start.sh
